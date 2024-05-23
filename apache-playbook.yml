@@ -1,0 +1,27 @@
+# Install and configure Apache HTTP Server & start apache service
+---
+- name: Install and configure Apache HTTP Server
+  hosts: webservers
+  become: true  # Run tasks with root privileges
+
+  tasks:
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present  # Ensure Apache is installed
+      tags:
+        - apache
+
+    - name: Copy Apache configuration file
+      template:
+        src: templates/httpd.conf.j2
+        dest: /etc/apache2/apache2.conf
+      notify: restart apache
+      tags:
+        - apache
+
+  handlers:
+    - name: restart apache
+      service:
+        name: apache2
+        state: restarted
